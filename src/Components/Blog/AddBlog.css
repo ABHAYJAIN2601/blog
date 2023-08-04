@@ -1,0 +1,41 @@
+/* Styling for the Add Post section container */
+.add-post-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  /* Styling for the form inside the Add Post section */
+  .add-post-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Styling for form input fields */
+  .add-post-form input[type="text"],
+  .add-post-form textarea {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    resize: vertical; /* Allow vertical resizing of the textarea */
+  }
+  
+  /* Styling for the submit button */
+  .add-post-form button[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .add-post-form button[type="submit"]:hover {
+    background-color: #0056b3;
+  }

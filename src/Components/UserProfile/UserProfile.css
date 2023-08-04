@@ -1,0 +1,49 @@
+.profile-wrapper{
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 0 auto;
+}
+
+/* Reset default styles for the tab component */
+.tab-container {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    /* border: 1px solid #ccc; */
+    /* border-radius: 5px; */
+    overflow: hidden;
+    width: 400px; /* Set the desired width for the tab container */
+  }
+  
+  /* Styling for the tab headers */
+  .tab-header {
+    display: flex;
+    /* background-color: #f0f0f0; */
+  }
+  
+  /* Styling for individual tab items */
+  .tab-item {
+    padding: 10px 20px;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .tab-item:hover {
+    background-color: #ddd;
+  }
+  
+  /* Styling for the active tab item */
+  .tab-item.active {
+    border-bottom: #007bff 2px solid;
+    color: black;
+  }
+  
+  /* Styling for the tab content */
+  .tab-content {
+    padding: 20px;
+    border-top: 1px solid #ccc;
+  }
+  
