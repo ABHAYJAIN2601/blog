@@ -16,6 +16,8 @@ import Navbar from './Navbar/Navbar'
 import AddBlog from './Blog/AddBlog'
 import UserProfile from './UserProfile/UserProfile'
 import ProtectedRoute from './ProtectedRoute'
+import List from './UserProfile/List'
+// import Payment from './Payment'
 
 function MainPage (props) {
   //   const [user, setUser] = useState('');
@@ -25,8 +27,6 @@ function MainPage (props) {
     const user = localStorage.getItem('username')
     console.log(props.isLoggedIn)
     if (props.isLoggedIn) {
-      //   setUser(user);
-      console.log(user, props.user)
       protectedRoutes = (
         <>
           <Route path='/dashboard' element={<BlogList />} />
@@ -40,6 +40,7 @@ function MainPage (props) {
   return (
     <div className='App'>
       <Navbar />
+      {/* <Payment /> */}
       <Routes>
         <Route path='/signup' element={<SignUp />}></Route>
         <Route path='/login' element={<LoginPage />}></Route>
@@ -51,9 +52,38 @@ function MainPage (props) {
             </ProtectedRoute>
           }
         />
-        <Route path='/blog/:id' element={<Blog />} />
-        <Route path='/add-blog' element={<AddBlog />} />
-        <Route path='/my-profile' element={<UserProfile />} />
+        <Route
+          path='/blog/:id'
+          element={
+            <ProtectedRoute>
+              <Blog />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/user-list/:id'
+          element={
+            <ProtectedRoute>
+              <List />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/add-blog'
+          element={
+            <ProtectedRoute>
+              <AddBlog />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path='/my-profile'
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   )

@@ -14,8 +14,7 @@
   }
   
   /* Styling for form input fields */
-  .add-post-form input[type="text"],
-  .add-post-form textarea {
+  .add-post-form input[type="text"] {
     padding: 10px;
     margin-bottom: 15px;
     border: 1px solid #ccc;
@@ -23,7 +22,15 @@
     font-size: 16px;
     resize: vertical; /* Allow vertical resizing of the textarea */
   }
-  
+  .add-post-form textarea {
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    resize: vertical; /* Allow vertical resizing of the textarea */
+    height: 500px;
+  }
   /* Styling for the submit button */
   .add-post-form button[type="submit"] {
     background-color: #007bff;

@@ -47,7 +47,7 @@ const UserProfile = props => {
         </div>
       </div>
       {activeTab==1&&<div>
-        <img src='http://localhost:3000/man.png' alt='profile' className='author-avatar'/>
+        <img src='http://localhost:3001/man.png' alt='profile' className='author-avatar'/>
         <p>{props.user.username}</p>
         <input
           type='text'
@@ -56,7 +56,7 @@ const UserProfile = props => {
           onChange={e => onChange(e)}
           value={props.user.bio}
         />
-        <button onClick={()=>props.updateUser(formData)}>Update</button>
+        <button className="blog-topic" onClick={()=>props.updateUser(formData)}>Update</button>
       </div>}
       {activeTab==0&&<div>
         <MyPosts/>

@@ -15,6 +15,11 @@ function Blog (props) {
       //   alert('Invalid Credentials');
     }
   }
+  function userExists () {
+    return props.blogData.likes.some(function (el) {
+      return el.user_id === props.user.id
+    })
+  }
   useEffect(() => {
     props.getBlogById(params.id)
     console.log(props)
@@ -43,51 +48,68 @@ function Blog (props) {
           <div className='author-section'>
             <img
               className='author-avatar'
-              src={'http://localhost:3000/blog1.webp'}
+              src={'http://localhost:3001/blog1.webp'}
               alt={props.blogData.title}
             />
             <span className='blog-author'>{props.blogData.author}</span>
-            <span className='blog-date'>{props.blogData.dateTime}</span>
+            <span className='blog-date'>
+              {props.blogData.created_at.split('T')[0]}
+            </span>
             <p className='blog-topic'>{props.blogData.topic}</p>
           </div>
 
-          
-        
           <img
-            src={'http://localhost:3000/blog1.webp'}
+            src={'http://localhost:3001/blog1.webp'}
             alt={props.blogData.title}
           />
           <p className='blog-content'>{props.blogData.text}</p>
           <div className='blog-like-container'>
-          <img className='like-clap' src='http://localhost:3000/clap.png' onClick={()=>props.likeBlog(props.blogData.id)}/>
-            <span className='like-count'>{props.blogData.likes}</span>
-           <img className='like-clap' src='http://localhost:3000/chat.png'/>
+            {userExists() ? (
+              <img
+                className='like-clap'
+                src='http://localhost:3001/clap.png'
+                onClick={() => props.likeBlog(props.blogData.id)}
+              />
+            ) : (
+              <img className='like-clap' src='http://localhost:3001/clap_solid.png' />
+            )}
+            <span className='like-count'>{props.blogData.likes.length}</span>
+            <img className='like-clap' src='http://localhost:3001/chat.png' />
             <span className='like-count'>{props.blogData.comments.length}</span>
-            </div>
+          </div>
           <div className='comment-section'>
             <h1>Comments</h1>
-            {props.blogData.comments.length>0 && props.blogData.comments.map(comment => {
-              return (
-                <div className='comment'>
-                  <div className='author-section'>
-                  <img
-                    className='author-avatar'
-                    src={'http://localhost:3000/blog1.webp'}
-                    alt={props.blogData.title}
-                  />
-                  <span className='blog-author'>{comment.author}</span>
+            {props.blogData.comments.length > 0 &&
+              props.blogData.comments.map(comment => {
+                return (
+                  <div className='comment'>
+                    <div className='author-section'>
+                      <img
+                        className='author-avatar'
+                        src={'http://localhost:3001/blog1.webp'}
+                        alt={props.blogData.title}
+                      />
+                      <span className='blog-author'>{comment.author}</span>
+                      <span className='blog-date'>
+                        {comment.created_at.split('T')[0]}
+                      </span>
+                    </div>
+                    <p className='comment-text'>{comment.text}</p>
                   </div>
-                  <p className='comment-text'>{comment.comment}</p>
-                </div>
-              )
-            })}
-            <input
-              type='text'
-              placeholder='Comment'
-              value={comment}
-              onChange={e => setComment(e.target.value)}
-            />
-            <button onClick={() => handleComment()}>Comment</button>
+                )
+              })}
+            <div className='comment-input-div'>
+              <input
+                className='comment-input'
+                type='text'
+                placeholder='Comment'
+                value={comment}
+                onChange={e => setComment(e.target.value)}
+              />
+              <button className='comment-btn' onClick={() => handleComment()}>
+                Comment
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -97,6 +119,7 @@ function Blog (props) {
 const mapStateToProps = state => {
   return {
     blogData: state.blogData,
+    user: state.userDetails,
     blogLoading: state.blogLoading
   }
 }

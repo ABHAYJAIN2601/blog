@@ -15,3 +15,7 @@ export const LIKE_BLOG='LIKE_BLOG';
 export const UNLIKE_BLOG='UNLIKE_BLOG';
 export const FOLLOW_USER='FOLLOW_USER';
 export const GET_USER_LISTS='GET_USER_LISTS';
+export const GET_LIST = "GET_LIST";
+export const GET_FILTER_BLOGS = "GET_FILTER_BLOGS";
+export const CREATE_LIST = "CREATE_LIST";
+export const SORT_BLOGS = "SORT_BLOGS";

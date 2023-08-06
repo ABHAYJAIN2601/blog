@@ -5,16 +5,17 @@ import './Blogs.css'
 import { Link } from 'react-router-dom'
 
 const BlogCard = (props) => {
+  console.log(props)
     return (
         <div className='blog-card' key={props.post.id}>
             <div className='blog-card-author'>
               <img
                 className='author-avatar'
-                src={'http://localhost:3000/man.png'}
+                src={'http://localhost:3001/man.png'}
                 alt={props.post.title}
               />
               <p className='blog-author'>{props.post.author}</p>
-              <p className='blog-date'>{props.post.dateTime}</p>
+              <p className='blog-date'>{props.post.created_at.split('T')[0]}</p>
               <p className='follow' onClick={()=>followUser(props.post.author_id)}>Follow</p>
             </div>
             <div className='blog-card-content-div'>
@@ -35,8 +36,14 @@ const BlogCard = (props) => {
             </div>
             <div className='card-footer'>
               <Link to={`/blog/${props.post.id}`}>View Blog</Link>
-              <img className='save-later-img' src='http://localhost:3000/ribbon.png' onClick={()=> props.saveForLater(props.post.id)}/>
-              {/* {(<button onClick={() => props.deleteBlog(props.post.id)}>Delete Post</button>)} */}
+              <div className='blog-like-container'>
+          <img className='like-clap' src='http://localhost:3001/clap.png' />
+            <span className='like-count'>{props.post.likes.length}</span>
+           <img className='like-clap' src='http://localhost:3001/chat.png'/>
+            <span className='like-count'>{props.post.comments.length}</span>
+            </div>
+              <img className='save-later-img' src='http://localhost:3001/ribbon.png' onClick={()=> props.saveForLater(props.post.id)}/>
+              {(<button className="blog-topic" onClick={() => props.deleteBlog(props.post.id)}>Delete Post</button>)}
           {/* <button onClick={()=>editBlog(props.post.id)}>Edit Blog</button> */}
             </div>
           </div>

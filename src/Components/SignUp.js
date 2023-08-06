@@ -1,12 +1,15 @@
 import React, { useState } from 'react'
-const SignUp = () => {
+import { signupUser } from '../Redux/useraction'
+import { connect } from 'react-redux'
+const SignUp = (props) => {
   const [formData, setFormData] = useState({})
   const handleSubmit = () => {
     console.log(formData)
+    props.signupUser(formData.email, formData.password)
   }
   const onChange = e => {
     // console.log(e.target.value)
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   }
   return (
     <div>
@@ -22,23 +25,6 @@ const SignUp = () => {
               <div class='login-form'>
                 <h3>SIGN UP</h3>
                 <form action=''>
-                  <div class='mail-input'>
-                    <div class='input-group flex-nowrap'>
-                      <span class='input-group-text' id='addon-wrapping'>
-                        <i class='fa-solid fa-envelope'></i>
-                      </span>
-                      <input
-                        id='signInEmail'
-                        type='text'
-                        class='form-control'
-                        placeholder='Username'
-                        name='username'
-                        onChange={onChange}
-                        aria-label='Username'
-                        aria-describedby='addon-wrapping'
-                      />
-                    </div>
-                  </div>
                   <div class='mail-input'>
                     <div class='input-group flex-nowrap'>
                       <span class='input-group-text' id='addon-wrapping'>
@@ -92,5 +78,9 @@ const SignUp = () => {
     </div>
   )
 }
-
-export default SignUp
+const dispatchStateToProps = dispatch => {
+  return {
+    signupUser: (email,password) => dispatch(signupUser(email,password))
+  }
+}
+export default connect(null, dispatchStateToProps)(SignUp)

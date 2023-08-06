@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { connect } from 'react-redux';
 import './AddBlog.css';
+import { addBlog } from '../../Redux/useraction';
 
 const AddBlog = (props) => {
     const [blogData , setBlogData] = useState({});
@@ -10,13 +11,14 @@ const AddBlog = (props) => {
   
     const addBlog = () => {
         const newPost = {
-          id: 1,
           title: blogData.title,
           topic: blogData.topic,
-          featuredImage: blogData.featuredImage,
+          featured_image: blogData.featuredImage,
           text: blogData.text,
-          dateTime: new Date().toISOString().split('T')[0],
-          author: props.user.username
+          created_at: new Date().toISOString(),
+          author: props.user.username,
+          likes:[],
+          comments:[]
         }
           props.addBlog(newPost);
         // setPosts([...posts, newPost]);
@@ -26,7 +28,7 @@ const AddBlog = (props) => {
           <div className='add-post-form'>
           <input type="text"  name="title" placeholder="Title" onChange={onChange} />
       <input type="text" name="topic" placeholder="Topic" onChange={onChange} />
-      {/* <input type="file" name="featuredImage" placeholder="Featured Image" onChange={onChange} /> */}
+      <input type="text" name="featuredImage" placeholder="Featured Image" onChange={onChange} />
       <textarea type="text" name="text" placeholder="Text" onChange={onChange} />
       <button className='btn-primary'onClick={() => addBlog()}>Add Post</button>
           </div>
@@ -42,7 +44,7 @@ const mapStateToProps = (state) => {
   }
   const mapDispatchToProps = (dispatch) => {
     return {
-      addBlog: (blog) => dispatch({type: 'ADD_BLOG', payload: blog}),
+      addBlog: (blog) => dispatch(addBlog(blog)),
     };
   }
   

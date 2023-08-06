@@ -20,12 +20,12 @@ const Navbar = (props) => {
               <Link to='/my-profile'>My Profile</Link>
             </li>
             <li>
-              <a href='/login'>{props.userName?props.userName: 'Sign In'}</a>
+              <Link to='/login'>{props.userName?props.userName: 'Sign In'}</Link>
             </li>
             <li>
             <Link to='/add-blog'>Add Blog</Link>
             </li>
-            <li>
+            <li className='logout-btn'>
             <Link onClick={()=>props.logoutUser()}>Log Out</Link>
             </li>
           </ul>

@@ -11,7 +11,11 @@ import {
   GET_USER_BLOGS,
   LIKE_BLOG,
   UNLIKE_BLOG,
-  GET_USER_LISTS
+  GET_USER_LISTS,
+  GET_LIST,
+  CREATE_LIST,
+  GET_FILTER_BLOGS,
+  SORT_BLOGS
 } from './types'
 const initialState = {
   isLoggedIn: false,
@@ -32,6 +36,9 @@ const initialState = {
   blogsLoading: true,
   userLists: [],
   listLoading: true,
+  listData: [],
+  listDataLoading: true,
+
   blogs: [
     {
       author_id: 1,
@@ -48,10 +55,10 @@ const initialState = {
           Duis tincidunt nisl nec eleifend condimentum. Ut at aliquam ligula. Duis volutpat at orci at aliquam. Pellentesque massa mi, congue a neque a, eleifend condimentum nisi. Curabitur elit nunc, scelerisque ut semper non, rutrum quis massa. Suspendisse vel finibus quam, nec auctor eros. Mauris vestibulum erat nisl, in efficitur dolor tincidunt nec. Fusce sagittis vulputate auctor. Donec gravida neque et eros suscipit, sit amet convallis turpis tempor. Fusce scelerisque mauris lorem, a finibus erat luctus at. Nam tempus mollis nisi. Aenean a sem vel neque mattis tristique. Nullam rhoncus ac ex ac fringilla. Maecenas hendrerit eget elit vitae eleifend.
           
           Fusce eleifend quam sed porta rutrum. Maecenas nec est id urna malesuada feugiat id at purus. Morbi pulvinar risus ut dolor finibus scelerisque. Integer eget augue odio. Nunc convallis mattis ipsum, vel auctor mauris convallis ut. Donec a mi finibus sapien blandit pretium. Curabitur ac malesuada odio, eget tempor tellus. Ut condimentum commodo sodales. Nam finibus feugiat urna. Nullam ut sem blandit, convallis ligula a, efficitur neque. Aenean sed sagittis dolor, sit amet dignissim leo. Nulla tincidunt dolor nec elit laoreet auctor. Nunc a nisi ex. Duis tortor ante, scelerisque id volutpat ut, lacinia et erat.`,
-      dateTime: '2023-08-03 12:00:00',
+      created_at: '2023-08-03T12:00:00',
       author: 'John Doe',
       comments: [],
-      likes:0
+      likes: []
     },
     {
       author_id: 2,
@@ -60,9 +67,10 @@ const initialState = {
       topic: 'JavaScript',
       featuredImage: './blog1.webp',
       text: 'In this blog post, we introduce JavaScript and its features...',
-      dateTime: '2023-08-02 10:30:00',
+      created_at: '2023-08-02T10:30:00',
       author: 'Jane Smith',
-      comments: []
+      comments: [],
+      likes:[]
     }
   ]
 }
@@ -92,7 +100,7 @@ const userReducer = (state = initialState, action) => {
       return {
         ...state,
         userDetails: {
-          id:1,
+          id: 1,
           ...action.payload.user
         },
         isLoggedIn: true
@@ -106,51 +114,50 @@ const userReducer = (state = initialState, action) => {
 
     case GET_BLOG_BY_ID:
       const blog = state.blogs.find(blog => blog.id == action.payload)
-      console.log(blog, action.payload)
+      
       return {
         ...state,
         blogData: blog,
         blogLoading: false
       }
     case GET_BLOGS:
-      return{
+      return {
         ...state,
         blogs: [...state.blogs,...action.payload],
         blogsLoading: false
       }
     case GET_USER_BLOGS:
-      return{
+      return {
         ...state,
-        blogs: [...state.blogs,...action.payload],
+        blogs: [...state.blogs, ...action.payload]
       }
     case LIKE_BLOG:
-      return{
+      return {
         ...state,
         blogData: {
           ...state.blogData,
-          likes: state.blogData.likes + 1
+          likes: [...state.blogData.likes,action.payload]
         }
       }
     case UNLIKE_BLOG:
-      return{
+      return {
         ...state,
         blogs: state.blogs.map(blog => {
-          if(blog.id === action.payload){
-            return{
+          if (blog.id === action.payload) {
+            return {
               ...blog,
               likes: blog.likes - 1
             }
-          }else{
+          } else {
             return blog
           }
         })
       }
     case UPDATE_USER:
-        return {
-            ...state,
-            userDetails: { ...state.userDetails, ...action.payload },
-        };
-  
+      return {
+        ...state,
+        userDetails: { ...state.userDetails, ...action.payload }
+      }
 
     case ADD_BLOG:
       return {
@@ -158,21 +165,14 @@ const userReducer = (state = initialState, action) => {
         blogs: [action.payload, ...state.blogs]
       }
     case ADD_COMMENT:
-      console.log(action.payload, state.blogs)
-      let commentObj = {
-        id: state.blogData.comments.length + 1,
-        author: state.userDetails.username,
-        comment: action.payload.comment,
-        date: new Date()
-      }
       return {
         ...state,
         blogData: {
           ...state.blogData,
-          comments: [...state.blogData.comments, commentObj]
+          comments: [...state.blogData.comments, action.payload]
         }
       }
-   
+
     case DELETE_BLOG:
       return {
         ...state,
@@ -181,13 +181,54 @@ const userReducer = (state = initialState, action) => {
         })
       }
     case GET_USER_LISTS:
-      return{
+      return {
         ...state,
         userLists: action.payload,
         listLoading: false
       }
-
-      default:
+    case GET_LIST:
+      return {
+        ...state,
+        listData: action.payload,
+        listDataLoading: false
+      }
+    case CREATE_LIST:
+      return {
+        ...state,
+        userLists: [
+          ...state.userLists,
+          { id: state.listData.length + 1, list_name: action.payload }
+        ]
+      }
+      case GET_FILTER_BLOGS:
+      console.log(action.payload.searchText.toLowerCase(),action.payload.filter)
+        return {
+          ...state,
+         blogs: state.blogs.filter(blog => {
+          return blog.author.toLowerCase().includes(action.payload.searchText.toLowerCase())
+        })
+        }
+        case SORT_BLOGS:
+          console.log(action.payload)
+          let sortedBlog=[...state.blogs]
+          if(action.payload==='Like'){
+            sortedBlog.sort((a,b)=>{
+             
+                return a.likes-b.likes
+             
+            })
+          }else if(action.payload==='Date'){
+            sortedBlog.sort((a,b)=>{
+             
+                return new Date(b.dateTime)-new Date(a.dateTime)
+             
+            })
+          }
+          return {
+            ...state,
+            blogs: sortedBlog
+          }
+    default:
       return state
   }
 }
