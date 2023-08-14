@@ -5,7 +5,7 @@ const SignUp = (props) => {
   const [formData, setFormData] = useState({})
   const handleSubmit = () => {
     console.log(formData)
-    props.signupUser(formData.email, formData.password)
+    props.signupUser(formData.email, formData.password,formData.name)
   }
   const onChange = e => {
     // console.log(e.target.value)
@@ -38,6 +38,23 @@ const SignUp = (props) => {
                         name='email'
                         onChange={onChange}
                         aria-label='Email'
+                        aria-describedby='addon-wrapping'
+                      />
+                    </div>
+                  </div>
+                  <div class='mail-input'>
+                    <div class='input-group flex-nowrap'>
+                      <span class='input-group-text' id='addon-wrapping'>
+                        <i class='fa-solid fa-envelope'></i>
+                      </span>
+                      <input
+                        id='signInEmail'
+                        type='text'
+                        class='form-control'
+                        placeholder='Name'
+                        name='name'
+                        onChange={onChange}
+                        aria-label='Name'
                         aria-describedby='addon-wrapping'
                       />
                     </div>
@@ -80,7 +97,7 @@ const SignUp = (props) => {
 }
 const dispatchStateToProps = dispatch => {
   return {
-    signupUser: (email,password) => dispatch(signupUser(email,password))
+    signupUser: (email,password,name) => dispatch(signupUser(email,password,name))
   }
 }
 export default connect(null, dispatchStateToProps)(SignUp)

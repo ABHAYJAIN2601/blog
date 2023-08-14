@@ -118,6 +118,7 @@
 .author-section{
     display: flex;
     align-items: center;
+    margin-bottom: 10px;
 }
 .blog-topic{
     font-size: 14px;
@@ -184,4 +185,9 @@
 .comment-input-div{
     display: flex;
     align-items: center;
+}
+
+.blog-img{
+    width: 611px;
+    height: 701px;
 }

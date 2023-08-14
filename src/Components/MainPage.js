@@ -1,5 +1,6 @@
 import BlogList from './Blog/BlogList'
 import LoginPage from './LoginPage/LoginPage'
+import jwt from 'jsonwebtoken'
 import { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import {
@@ -7,7 +8,8 @@ import {
   Route,
   Switch,
   Routes,
-  useNavigate
+  useNavigate,
+  redirect
 } from 'react-router-dom'
 import SignUp from './SignUp'
 import Blog from './Blog/Blog'
@@ -17,26 +19,31 @@ import AddBlog from './Blog/AddBlog'
 import UserProfile from './UserProfile/UserProfile'
 import ProtectedRoute from './ProtectedRoute'
 import List from './UserProfile/List'
+import { getUserById } from '../Redux/useraction'
+import setAuthToken from '../Redux/setAuth'
 // import Payment from './Payment'
 
 function MainPage (props) {
-  //   const [user, setUser] = useState('');
-  let protectedRoutes
+
   const navigate = useNavigate()
   useEffect(() => {
-    const user = localStorage.getItem('username')
-    console.log(props.isLoggedIn)
+    function fetchData() {
+      const token = localStorage.getItem('token');
+      if(token){
+        props.getUserById(jwt.decode(token, 'SECRET').id);
+        setAuthToken(token);
+      }
+      
+    }
+    fetchData();
+ 
     if (props.isLoggedIn) {
-      protectedRoutes = (
-        <>
-          <Route path='/dashboard' element={<BlogList />} />
-        </>
-      )
       navigate('/')
     } else {
       navigate('/login')
     }
-  }, [])
+  
+  }, [props.isLoggedIn])
   return (
     <div className='App'>
       <Navbar />
@@ -76,6 +83,14 @@ function MainPage (props) {
             </ProtectedRoute>
           }
         />
+          <Route
+          path='/edit-blog/:id'
+          element={
+            <ProtectedRoute>
+              <AddBlog />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path='/my-profile'
           element={
@@ -90,7 +105,13 @@ function MainPage (props) {
 }
 const mapStateToProps = state => {
   return {
-    isLoggedIn: state.isLoggedIn
+    isLoggedIn: state.isLoggedIn,
+    user: state.userDetails
   }
 }
-export default connect(mapStateToProps, null)(MainPage)
+const mapDispatchToProps = dispatch => {
+  return {
+    getUserById: id => dispatch(getUserById(id))
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(MainPage)

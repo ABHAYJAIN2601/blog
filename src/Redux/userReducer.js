@@ -15,22 +15,23 @@ import {
   GET_LIST,
   CREATE_LIST,
   GET_FILTER_BLOGS,
-  SORT_BLOGS
+  SORT_BLOGS,
+  GET_USER_BY_ID,
+  SAVE_DRAFT,
+  UNFOLLOW_USER,
+  FOLLOW_USER,
+  POST_TYPE,
+  SAVE_FOR_LATER,
+  DELETE_DRAFT,
+  EDIT_BLOG,
+  GET_REVISIONS
 } from './types'
 const initialState = {
   isLoggedIn: false,
-  username: '',
-  email: '',
-  profileImage: '',
-  user_id: '',
-  password: '',
-  confirmPassword: '',
-  action: 'Signup',
-  msg: '',
-  err: '',
-  passmsg: '',
+
   userDetails: {},
-  type: 'Student',
+  blogRevisionData: {},
+  revisionListLoading: true,
   blogData: {},
   blogLoading: true,
   blogsLoading: true,
@@ -38,15 +39,33 @@ const initialState = {
   listLoading: true,
   listData: [],
   listDataLoading: true,
-
+  drafts: [],
+  revisionBlog:[
+    {
+      id:4,
+      revisions:[{
+        user_id: 1,
+        id: 6,
+        title: 'Introduction to JavaScript',
+        topic: 'JavaScript',
+        img_url: './blog1.webp',
+        body: 'In this blog post, we introduce JavaScript and its features...',
+        created_at: '2023-08-02T10:30:00',
+        author: 'Jane Smith',
+        comment: [],
+        likes: [],
+        views: 0
+      }]
+    }
+  ],
   blogs: [
     {
-      author_id: 1,
-      id: 1,
+      user_id: 1,
+      id: 10,
       title: 'Getting Started with React',
       topic: 'React',
-      featuredImage: './blog1.webp',
-      text: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at quam lacus. Phasellus odio libero, consequat sed dolor at, faucibus bibendum mauris. Curabitur at metus sed libero tincidunt condimentum. Curabitur in lorem et dui pretium ultrices. Proin magna tellus, vehicula vel ante a, elementum dapibus erat. Integer et lobortis ante, sit amet euismod lectus. Donec id sapien eget ante condimentum pulvinar id ac lectus. Proin ac arcu est.
+      img_url: './blog1.webp',
+      body: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi at quam lacus. Phasellus odio libero, consequat sed dolor at, faucibus bibendum mauris. Curabitur at metus sed libero tincidunt condimentum. Curabitur in lorem et dui pretium ultrices. Proin magna tellus, vehicula vel ante a, elementum dapibus erat. Integer et lobortis ante, sit amet euismod lectus. Donec id sapien eget ante condimentum pulvinar id ac lectus. Proin ac arcu est.
 
           Donec tristique viverra ex, in hendrerit dolor auctor at. Vestibulum porta tempus scelerisque. Sed sagittis malesuada elit nec congue. Sed vestibulum sapien sed massa egestas, suscipit sodales orci ornare. Curabitur dignissim congue purus sed rutrum. Phasellus faucibus quam ut fringilla condimentum. Aliquam et venenatis est. Aenean rhoncus enim a ipsum accumsan cursus. Donec tortor metus, consectetur eu lacus sed, hendrerit convallis leo.
           
@@ -57,20 +76,22 @@ const initialState = {
           Fusce eleifend quam sed porta rutrum. Maecenas nec est id urna malesuada feugiat id at purus. Morbi pulvinar risus ut dolor finibus scelerisque. Integer eget augue odio. Nunc convallis mattis ipsum, vel auctor mauris convallis ut. Donec a mi finibus sapien blandit pretium. Curabitur ac malesuada odio, eget tempor tellus. Ut condimentum commodo sodales. Nam finibus feugiat urna. Nullam ut sem blandit, convallis ligula a, efficitur neque. Aenean sed sagittis dolor, sit amet dignissim leo. Nulla tincidunt dolor nec elit laoreet auctor. Nunc a nisi ex. Duis tortor ante, scelerisque id volutpat ut, lacinia et erat.`,
       created_at: '2023-08-03T12:00:00',
       author: 'John Doe',
-      comments: [],
-      likes: []
+      comment: [],
+      likes: [],
+      views: 0
     },
     {
-      author_id: 2,
-      id: 2,
+      user_id: 1,
+      id: 21,
       title: 'Introduction to JavaScript',
       topic: 'JavaScript',
-      featuredImage: './blog1.webp',
-      text: 'In this blog post, we introduce JavaScript and its features...',
+      img_url: './blog1.webp',
+      body: 'In this blog post, we introduce JavaScript and its features...',
       created_at: '2023-08-02T10:30:00',
       author: 'Jane Smith',
-      comments: [],
-      likes:[]
+      comment: [],
+      likes: [],
+      views: 0
     }
   ]
 }
@@ -89,6 +110,12 @@ const userReducer = (state = initialState, action) => {
     //         err: action.payload,
     //     };
     // };
+    case GET_USER_BY_ID:
+      return {
+        ...state,
+        userDetails: action.payload,
+        isLoggedIn: true
+      }
     case LOGIN_USER:
       return {
         ...state,
@@ -96,25 +123,79 @@ const userReducer = (state = initialState, action) => {
       }
 
     case SET_CURRENT_USER:
-      localStorage.setItem('user', action.payload.user)
+      localStorage.setItem('user', action.payload)
       return {
         ...state,
         userDetails: {
-          id: 1,
           ...action.payload.user
         },
         isLoggedIn: true
       }
-
+    case FOLLOW_USER:
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          followed_user_ids: [
+            ...state.userDetails.followed_user_ids,
+            action.payload
+          ]
+        }
+      }
+    case UNFOLLOW_USER:
+      return {
+        ...state,
+        userDetails: {
+          ...state.userDetails,
+          followed_user_ids: state.userDetails.followed_user_ids.filter(
+            user => user !== action.payload
+          )
+        }
+      }
     case LOGOUT_USER:
       return {
         ...state,
         isLoggedIn: false
       }
+    case SAVE_DRAFT: {
+      return {
+        ...state,
+        drafts: [...state.drafts, action.payload]
+      }
+    }
+    case SAVE_FOR_LATER:
+      const userIndex = state.userLists.findIndex(
+        user => user.id === action.payload.id
+      )
+      const blogIndex = state.blogs.findIndex(
+        blog => blog.id === action.payload.blogId
+      )
+      console.log(userIndex, blogIndex)
+      if (userIndex !== -1 && blogIndex !== -1) {
+        const user = state.userLists[userIndex]
+        const blogToAdd = state.blogs[blogIndex]
+
+        if (!user.blogs.some(blog => blog.id === blogToAdd.id)) {
+          let updatedUser = {
+            ...user,
+            blogs: [...user.blogs, blogToAdd]
+          }
+
+          let updatedUserLists = [...state.userLists]
+          updatedUserLists[userIndex] = updatedUser
+          console.log(updatedUserLists)
+          return {
+            ...state,
+            userLists: updatedUserLists
+          };
+         
+        }
+      }
+      console.log('User or blog not found')
+      return state; // Return the original state if user or blog not found
 
     case GET_BLOG_BY_ID:
       const blog = state.blogs.find(blog => blog.id == action.payload)
-      
       return {
         ...state,
         blogData: blog,
@@ -123,35 +204,37 @@ const userReducer = (state = initialState, action) => {
     case GET_BLOGS:
       return {
         ...state,
-        blogs: [...state.blogs,...action.payload],
+        blogs: action.payload,
         blogsLoading: false
+      }
+    case POST_TYPE:
+      return {
+        ...state,
+        blogs: action.payload
       }
     case GET_USER_BLOGS:
       return {
         ...state,
-        blogs: [...state.blogs, ...action.payload]
+        blogs: action.payload
       }
     case LIKE_BLOG:
       return {
         ...state,
         blogData: {
           ...state.blogData,
-          likes: [...state.blogData.likes,action.payload]
+          likes: [...state.blogData.likes, state.userDetails.id]
         }
       }
+    
     case UNLIKE_BLOG:
       return {
         ...state,
-        blogs: state.blogs.map(blog => {
-          if (blog.id === action.payload) {
-            return {
-              ...blog,
-              likes: blog.likes - 1
-            }
-          } else {
-            return blog
-          }
-        })
+        blogData: {
+          ...state.blogData,
+          likes: state.blogData.likes.filter(user => {
+            return user !== state.userDetails.id
+          })
+        }
       }
     case UPDATE_USER:
       return {
@@ -164,15 +247,59 @@ const userReducer = (state = initialState, action) => {
         ...state,
         blogs: [action.payload, ...state.blogs]
       }
+      case EDIT_BLOG:
+        // const revisionBlog = state.revisionBlog.findIndex(blog => blog.id == action.payload.id);
+        // if(revisionBlog !== -1){
+        //   revisionBlog.revisions.push(action.payload.blog)
+        // }
+        console.log(action.payload)
+      return {
+        ...state,
+      
+        revisionBlog:state.revisionBlog.map(blog => {
+          if (blog.id === action.payload.id) {
+            console.log('heys',blog)
+            return {
+              ...blog,
+              revisions: [...blog.revisions, action.payload.blog],
+            };
+          }
+          return blog;
+        }).concat(
+          state.revisionBlog.find(blog => blog.id === action.payload.id)
+            ? [] // If the blog is found, no need to add a new entry
+            : [{ id: action.payload.id, revisions: [action.payload.blog] }] // If the blog is not found, add a new entry
+        ),
+        blogs: state.blogs.map(blog => {
+          if (blog.id === action.payload.id) {
+            return action.payload.blog
+          }
+          return blog
+        })
+      }
+    case GET_REVISIONS:
+      console.log('heyyy',action.payload,state.revisionBlog.find(blog => blog.id === action.payload));
+      return {
+        ...state,
+        blogRevisionData: state.revisionBlog.find(blog => blog.id === action.payload),
+        revisionListLoading: false,
+        }
     case ADD_COMMENT:
       return {
         ...state,
         blogData: {
           ...state.blogData,
-          comments: [...state.blogData.comments, action.payload]
+          comment: [...state.blogData.comment, action.payload],
+          commenters: [...state.blogData.commenters, state.userDetails.name]
         }
       }
-
+      case DELETE_DRAFT:
+        return {
+          ...state,
+          drafts: state.drafts.filter(draft => {
+            return draft.id !== action.payload
+          })
+        }
     case DELETE_BLOG:
       return {
         ...state,
@@ -187,10 +314,18 @@ const userReducer = (state = initialState, action) => {
         listLoading: false
       }
     case GET_LIST:
+      const listIndex = state.userLists.findIndex(
+        user => user.id === action.payload.id
+      )
+      if (listIndex !== -1) {
+        return {
+          ...state,
+          listData: state.userLists[listIndex].blogs,
+          listDataLoading: false
+        }
+      }
       return {
         ...state,
-        listData: action.payload,
-        listDataLoading: false
       }
     case CREATE_LIST:
       return {
@@ -200,34 +335,31 @@ const userReducer = (state = initialState, action) => {
           { id: state.listData.length + 1, list_name: action.payload }
         ]
       }
-      case GET_FILTER_BLOGS:
-      console.log(action.payload.searchText.toLowerCase(),action.payload.filter)
-        return {
-          ...state,
-         blogs: state.blogs.filter(blog => {
-          return blog.author.toLowerCase().includes(action.payload.searchText.toLowerCase())
+    case GET_FILTER_BLOGS:
+      return {
+        ...state,
+        blogs: action.payload
+      }
+    case SORT_BLOGS:
+      let sortedBlog = [...state.blogs]
+      if (action.payload === 'Like') {
+        sortedBlog.sort((a, b) => {
+          return b.likes.length - a.likes.length
         })
-        }
-        case SORT_BLOGS:
-          console.log(action.payload)
-          let sortedBlog=[...state.blogs]
-          if(action.payload==='Like'){
-            sortedBlog.sort((a,b)=>{
-             
-                return a.likes-b.likes
-             
-            })
-          }else if(action.payload==='Date'){
-            sortedBlog.sort((a,b)=>{
-             
-                return new Date(b.dateTime)-new Date(a.dateTime)
-             
-            })
-          }
-          return {
-            ...state,
-            blogs: sortedBlog
-          }
+      } else if (action.payload === 'Comment') {
+        sortedBlog.sort((a, b) => {
+          return  b.comment.length - a.comment.length
+        })
+      }
+      else if (action.payload === 'Views') {
+        sortedBlog.sort((a, b) => {
+          return  b.views - a.views
+        })
+      }
+      return {
+        ...state,
+        blogs: sortedBlog
+      }
     default:
       return state
   }

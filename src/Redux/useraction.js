@@ -1,10 +1,11 @@
-// import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken'
 import axios from 'axios'
-import setAuthenticationToken from "./setAuth";
+import setAuthenticationToken from './setAuth'
 
 import {
   // SIGNUP_USER,
   // SIGNUP_USER_ERROR,
+  GET_USER_BY_ID,
   LOGIN_USER,
   LOGOUT_USER,
   SET_CURRENT_USER,
@@ -22,20 +23,24 @@ import {
   GET_FILTER_BLOGS,
   CREATE_LIST,
   SORT_BLOGS,
-  ADD_BLOG
+  ADD_BLOG,
+  SAVE_DRAFT,
+  DELETE_BLOG,
+  UNFOLLOW_USER,
+  POST_TYPE,
+  EDIT_BLOG,
+  GET_REVISIONS
 } from './types'
 
-export const signupUser = (email, password) => {
-
+export const signupUser = (email, password, name) => {
   return function (dispatch) {
     var OPTIONS = {
       url: 'http://localhost:3000/signup',
       method: 'POST',
       data: {
-        user:{
-          email:email,
-          password:password,
-        }
+        email: email,
+        password: password,
+        name: name
       },
 
       headers: {
@@ -58,13 +63,13 @@ export const signupUser = (email, password) => {
         //     // token: jwt.decode(res.data.token),
         //   })
         // )
-        if(res.data.status.code===200){
+        if (res.data.status.code === 200) {
           dispatch({
             type: LOGIN_USER,
             isLoggedIn: true
           })
         }
-        
+
         // window.location.href = '/'
       })
       .catch(err => {
@@ -82,13 +87,11 @@ export const signupUser = (email, password) => {
 export const loginUser = (username, password) => {
   return function (dispatch) {
     var OPTIONS = {
-      url: 'http://localhost:3000/login',
+      url: 'http://localhost:3000/signin',
       method: 'POST',
       data: {
-        user: {
-          email: username,
-          password: password
-        }
+        email: username,
+        password: password
       },
       headers: {
         'content-type': 'application/json'
@@ -96,38 +99,35 @@ export const loginUser = (username, password) => {
     }
 
     axios(OPTIONS)
-        .then((res) => {
-          console.log(res)
-            const token = res.headers.authorization;
-            localStorage.setItem("token", token);
-            setAuthenticationToken(token);
-            console.log(res)
+      .then(res => {
+        console.log(res)
+        const token = res.data.token
+        localStorage.setItem('token', token)
+        setAuthenticationToken(token)
+        console.log(jwt.decode(token, 'SECRET'))
 
-            if(res.data.status.code===200){
-              dispatch(
-                setCurrentUser({
-                  user: {username:res.data.data.email,...res.data.data}
-                  // token: jwt.decode(res.data.token),
-                })
-              )
-              dispatch({
-                type: LOGIN_USER,
-                isLoggedIn: true
-              })
-            }
-          
-        })
-        .catch((err) => {
-            // dispatch(showMessage("warning", "Invalid credentials", 900));
-            // dispatch({
-            //     type: LOGIN_USER_ERROR,
-            //     payload: "Invalid credentials",
-            //     isLoggedIn: false,
-            // });
-            console.log(err);
-        });
-  
-   
+        if (res.data.msg === 'Signed In Successfully') {
+          dispatch(getUserById(jwt.decode(token, 'SECRET').id))
+          // dispatch(
+          //   setCurrentUser({
+          //     user: { id: jwt.decode(token, 'SECRET').id }
+          //   })
+          // )
+          dispatch({
+            type: LOGIN_USER,
+            isLoggedIn: true
+          })
+        }
+      })
+      .catch(err => {
+        // dispatch(showMessage("warning", "Invalid credentials", 900));
+        // dispatch({
+        //     type: LOGIN_USER_ERROR,
+        //     payload: "Invalid credentials",
+        //     isLoggedIn: false,
+        // });
+        console.log(err)
+      })
   }
 }
 
@@ -141,6 +141,7 @@ export const setCurrentUser = user => {
 }
 export const logoutUser = () => {
   return function (dispatch) {
+    localStorage.removeItem('token')
     dispatch(setCurrentUser({ user: {}, token: {} }))
     dispatch({
       type: LOGOUT_USER
@@ -152,53 +153,52 @@ export const logoutUser = () => {
 export const getBlogById = id => {
   console.log(id)
   return function (dispatch) {
-    // var OPTIONS = {
-    //   url: 'http://localhost:3000/posts/' + id,
-    //   method: 'GET',
-    //   headers: {
-    //     'content-type': 'application/json'
-    //   }
-    // }
+    var OPTIONS = {
+      url: `http://localhost:3000/post/id/?id=${id}&viewing=true`,
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
 
-    // axios(OPTIONS)
-    //   .then(res => {
-    //     dispatch({
-    //       type: GET_BLOG_BY_ID,
-    //       payload: res.data
-    //     })
-    //   })
-    //   .catch(err => {
-    //     console.log(err)
-    //   })
-      dispatch({
-        type: GET_BLOG_BY_ID,
-        payload: id
+    axios(OPTIONS)
+      .then(res => {
+        console.log(res.data.post)
+        // dispatch({
+        //   type: GET_BLOG_BY_ID,
+        //   payload: res.data.post
+        // })
       })
+      .catch(err => {
+        console.log(err)
+      })
+    dispatch({
+      type: GET_BLOG_BY_ID,
+      payload: id
+    })
   }
 }
 export const addBlog = blog => {
   console.log(blog)
   return function (dispatch) {
-    // var OPTIONS = {
-    //   url: 'http://localhost:3000/posts',
-    //   method: 'POST',
-    //   data: blog,
-    //   headers: {
-    //     'content-type': 'application/json'
-    //   }
-    // }
+    var OPTIONS = {
+      url: 'http://localhost:3000/post/create',
+      method: 'POST',
+      data: blog,
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
 
-    // axios(OPTIONS)
-    //   .then(res => {
-        
-    //   })
-    //   .catch(err => {
-    //     console.log(err)
-    //   })
-
-      dispatch({
-        type: ADD_BLOG,
-        payload: blog
+    axios(OPTIONS)
+      .then(res => {
+        dispatch({
+          type: ADD_BLOG,
+          payload: blog
+        })
+      })
+      .catch(err => {
+        console.log(err)
       })
   }
 }
@@ -206,29 +206,28 @@ export const addComment = (id, comment) => {
   console.log(id, comment)
   return function (dispatch) {
     var OPTIONS = {
-        url: "http://localhost:3000/comments",
-        method: "POST",
-        headers: {
-            "content-type": "application/json",
-        },
-        data:{post_id:id,text:comment}
-    };
+      url: 'http://localhost:3000/post/comment',
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: { id: id, comment: comment }
+    }
 
     axios(OPTIONS)
-        .then((res) => {
-          console.log(res)
-          dispatch({
-            type: ADD_COMMENT,
-            payload: res.data
-          })
+      .then(res => {
+        console.log(res)
+        dispatch({
+          type: ADD_COMMENT,
+          payload: comment
         })
-        .catch((err) => {
-            console.log(err);
-        });
-   
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }
-export const saveForLater = id => {
+export const saveForLater = (id, blogId) => {
   return function (dispatch) {
     // var OPTIONS = {
     //     url: "/blog/" + id,
@@ -247,7 +246,7 @@ export const saveForLater = id => {
     //     });
     dispatch({
       type: SAVE_FOR_LATER,
-      payload: { id }
+      payload: { id, blogId }
     })
   }
 }
@@ -280,7 +279,7 @@ export const updateUser = data => {
 export const getBlogs = () => {
   return function (dispatch) {
     var OPTIONS = {
-      url: 'http://localhost:3000/posts',
+      url: 'http://localhost:3000/post/latest',
       method: 'GET',
       headers: {
         'content-type': 'application/json'
@@ -291,7 +290,7 @@ export const getBlogs = () => {
       .then(res => {
         dispatch({
           type: GET_BLOGS,
-          payload: res.data
+          payload: res.data.posts
         })
       })
       .catch(err => {
@@ -302,99 +301,100 @@ export const getBlogs = () => {
 export const getUserBlogs = userId => {
   console.log(userId)
   return function (dispatch) {
-    // var OPTIONS = {
-    //     url: "/blog",
-    //     method: "GET",
-    //     headers: {
-    //         "content-type": "application/json",
-    //     },
-    // };
+    var OPTIONS = {
+      url: 'http://localhost:3000/post/search/user_id',
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: { id: userId }
+    }
 
-    // axios(OPTIONS)
-    //     .then((res) => {
-
-    //     })
-    //     .catch((err) => {
-    //         console.log(err);
-    //     });
-    dispatch({
-      type: GET_USER_BLOGS,
-      payload: []
-    })
+    axios(OPTIONS)
+      .then(res => {
+        dispatch({
+          type: GET_USER_BLOGS,
+          payload: res.data.posts
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }
 
 export const likeBlog = id => {
-  console.log(id)
   return function (dispatch) {
     var OPTIONS = {
-        url: "http://localhost:3000/likes",
-        method: "POST",
-        headers: {
-            "content-type": "application/json",
-        },
-        data:{post_id:id}
-    };
+      url: 'http://localhost:3000/post/like',
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: { id: id }
+    }
 
     axios(OPTIONS)
-        .then((res) => {
-          console.log(res.data)
-          dispatch({
-            type: LIKE_BLOG,
-            payload: res.data
-          })
+      .then(res => {
+        dispatch({
+          type: LIKE_BLOG,
+          payload: id
         })
-        .catch((err) => {
-            console.log(err);
-        });
-   
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }
+
 export const unLikeBlog = id => {
   return function (dispatch) {
-    // var OPTIONS = {
-    //     url: "/blog",
-    //     method: "GET",
-    //     headers: {
-    //         "content-type": "application/json",
-    //     },
-    // };
+    var OPTIONS = {
+      url: 'http://localhost:3000/post/unlike',
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: {
+        id: id
+      }
+    }
 
-    // axios(OPTIONS)
-    //     .then((res) => {
-
-    //     })
-    //     .catch((err) => {
-    //         console.log(err);
-    //     });
-    dispatch({
-      type: UNLIKE_BLOG,
-      payload: id
-    })
+    axios(OPTIONS)
+      .then(res => {
+        dispatch({
+          type: UNLIKE_BLOG,
+          payload: id
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }
 
 export const followUser = id => {
   return function (dispatch) {
-    // var OPTIONS = {
-    //     url: "/blog",
-    //     method: "GET",
-    //     headers: {
-    //         "content-type": "application/json",
-    //     },
-    // };
+    var OPTIONS = {
+      url: 'http://localhost:3000/follow',
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: { id: id }
+    }
 
-    // axios(OPTIONS)
-    //     .then((res) => {
-
-    //     })
-    //     .catch((err) => {
-    //         console.log(err);
-    //     });
-    dispatch({
-      type: FOLLOW_USER,
-      payload: id
-    })
+    axios(OPTIONS)
+      .then(res => {
+        console.log(res)
+        dispatch({
+          type: FOLLOW_USER,
+          payload: id
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }
 export const getUserLists = id => {
@@ -418,8 +418,8 @@ export const getUserLists = id => {
     dispatch({
       type: GET_USER_LISTS,
       payload: [
-        { id: 1, list_name: 'Technology' },
-        { id: 2, list_name: 'React.js' }
+        { id: 1, list_name: 'Technology', blogs: [] },
+        { id: 2, list_name: 'React.js', blogs: [] }
       ]
     })
   }
@@ -427,35 +427,74 @@ export const getUserLists = id => {
 
 export const getList = id => {
   return function (dispatch) {
+    console.log(id)
     dispatch({
       type: GET_LIST,
-      payload: [
-        {
-          author_id: 2,
-          id: 2,
-          title: 'Introduction to JavaScript',
-          topic: 'JavaScript',
-          featuredImage: './blog1.webp',
-          text: 'In this blog post, we introduce JavaScript and its features...',
-          created_at: '2023-08-02T0:30:00',
-          author: 'Jane Smith',
-          comments: [],
-          likes: []
-
-        }
-      ]
+      payload: id
     })
   }
 }
+export const editBlog = (id, blog) => {
+  return function (dispatch) {
+    var OPTIONS = {
+      url: 'http://localhost:3000/post/edit',
+      method: 'PUT',
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: {...blog,image:'sd'}
+    }
 
+    axios(OPTIONS)
+      .then(res => {
+        console.log(res)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    dispatch({
+      type: EDIT_BLOG,
+      payload: { id, blog }
+    })
+  }
+}
 export const getFilterBlogs = (searchText, filter) => {
   console.log(searchText, filter)
+  let url = ''
+  let data = {}
+
+  if (filter === 'Topic') {
+    url = 'http://localhost:3000/post/search/topic'
+    data = { topic: searchText }
+  } else if (filter === 'Title') {
+    url = 'http://localhost:3000/post/search/title'
+    data = { title: searchText }
+  } else if (filter === 'Author') {
+    url = 'http://localhost:3000/post/search/author'
+    data = { name: searchText }
+  }
 
   return function (dispatch) {
-    dispatch({
-      type: GET_FILTER_BLOGS,
-      payload: { searchText, filter }
-    })
+    var OPTIONS = {
+      url: url,
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: data
+    }
+
+    axios(OPTIONS)
+      .then(res => {
+        console.log('like', res.data)
+        dispatch({
+          type: GET_FILTER_BLOGS,
+          payload: res.data.posts
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }
 export const sortBlogs = sort => {
@@ -474,5 +513,163 @@ export const createList = data => {
       type: CREATE_LIST,
       payload: data
     })
+  }
+}
+export const getRevision = id => {
+  return function (dispatch) {
+    // var OPTIONS = {
+    //     url: "/blog",
+    //     method: "GET",
+    //     headers: {
+    //         "content-type": "application/json",
+    //     },
+    // };
+
+    // axios(OPTIONS)
+    //     .then((res) => {
+
+    //     })
+    //     .catch((err) => {
+    //         console.log(err);
+    //     });
+    console.log(id)
+    dispatch({
+      type: GET_REVISIONS,
+      payload: id
+    })
+  }
+}
+export const getUserById = id => {
+  console.log(id)
+  return function (dispatch) {
+    var OPTIONS = {
+      url: 'http://localhost:3000/profile?id=' + id,
+      method: 'GET',
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
+
+    axios(OPTIONS)
+      .then(res => {
+        console.log('like', res.data)
+        dispatch({
+          type: GET_USER_BY_ID,
+          payload: res.data
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+}
+export const saveDraft = data => {
+  console.log(data)
+  return function (dispatch) {
+    // var OPTIONS = {
+    //   url: 'http://localhost:3000/post/draft',
+    //   method: 'POST',
+    //   headers: {
+    //     'content-type': 'application/json'
+    //   },
+    //   data: data
+    // }
+
+    // axios(OPTIONS)
+    //   .then(res => {
+    //     console.log(res.data)
+
+    //   })
+    //   .catch(err => {
+    //     console.log(err)
+    //   })
+    dispatch({
+      type: SAVE_DRAFT,
+      payload: data
+    })
+  }
+}
+export const deleteBlog = id => {
+  console.log(id)
+  return function (dispatch) {
+    var OPTIONS = {
+      url: 'http://localhost:3000/post/delete',
+      method: 'DELETE',
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: { id: id }
+    }
+
+    axios(OPTIONS)
+      .then(res => {
+        console.log(res.data)
+        dispatch({
+          type: DELETE_BLOG,
+          payload: id
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+}
+
+export const unFollowUser = id => {
+  return function (dispatch) {
+    var OPTIONS = {
+      url: 'http://localhost:3000/unfollow',
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json'
+      },
+      data: { id: id }
+    }
+
+    axios(OPTIONS)
+      .then(res => {
+        console.log(res.data)
+        dispatch({
+          type: UNFOLLOW_USER,
+          payload: res.data.id
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
+  }
+}
+
+export const postType = type => {
+  console.log(type)
+  let url = '';
+  let method = 'GET';
+  if (type === 'top') {
+    url = 'http://localhost:3000/posts/top'
+  } else if (type === 'latest') {
+    url = 'http://localhost:3000/post/latest'
+  } else if (type ==='recommend'){
+    url = 'http://localhost:3000/post/recommended'
+    method = 'POST'
+  }
+
+  return function (dispatch) {
+    const config = {
+      url: url,
+      method: method,
+      headers: {
+        'content-type': 'application/json'
+      }
+    }
+    axios(config)
+      .then(res => {
+        dispatch({
+          type: POST_TYPE,
+          payload: res.data.posts
+        })
+      })
+      .catch(err => {
+        console.log(err)
+      })
   }
 }

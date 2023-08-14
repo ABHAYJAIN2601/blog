@@ -72,3 +72,28 @@
     margin-bottom: 20px;
   }
   
+  .modal-content{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+    margin: auto;
+    top: 50%;
+    color: black;
+    pointer-events: auto;
+    background-color: #9f9f9f;
+    background-clip: padding-box;
+    border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
+    border-radius: var(--bs-modal-border-radius);
+    outline: 0;
+  }
+  .blog-type{
+    /* display: flex; */
+    position: relative;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    transition: background-color 0.2s ease;
+  }

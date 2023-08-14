@@ -1,11 +1,11 @@
 import axios from "axios";
+// import jwt from "jsonwebtoken";
 const setAuthToken = (token) => {
     if (token) {
-        token.replace("Bearer","");
-
-        axios.defaults.headers.common["Authorization"] = token;
+      
+        axios.defaults.headers.common["token"] = token;
     } else {
-        delete axios.defaults.headers.common["Authorization"];
+        delete axios.defaults.headers.common["token"];
     }
 };
 
