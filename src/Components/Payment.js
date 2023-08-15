@@ -19,12 +19,11 @@ function Payment (props) {
       document.body.appendChild(script)
     })
   }
-  // useEffect(() => {}, [planRate,getUserPlan(props.user.id)]);
   function getUserPlan(userId) {
     const usersData = JSON.parse(localStorage.getItem('usersData')) || {};
   
     if (usersData[userId] && usersData[userId].plan) {
-      // console.log(usersData[userId].plan)
+ 
       return usersData[userId].plan;
     } else {
       return 'Free';
@@ -48,7 +47,6 @@ function Payment (props) {
   
   async function displayRazorpay (rate) {
     setPlanRate(rate);
-    console.log(rate)
     const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js')
 
     if (!res) {

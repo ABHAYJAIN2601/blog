@@ -26,7 +26,7 @@ function Blog (props) {
     const maxAllowedViews = {
       1:100,
       50: 10000,
-      60: 5,
+      60: 0,
       70: 6 // Premium users can view unlimited times
     }
 
@@ -59,13 +59,15 @@ function Blog (props) {
     }
   }
   function userExists () {
+    // return true;
+    if(props.blogData.likes.length === 0) return false
     return props.blogData.likes.some(function (el) {
-      return el === props.user.id
+      return el == props.user.id
     })
   }
   useEffect(() => {
     props.getBlogById(params.id)
-  }, [props.blogData])
+  }, [])
   const [showDropdown, setShowDropdown] = useState(false)
 
   return (
@@ -110,7 +112,7 @@ function Blog (props) {
           />
           <p className='blog-content'>{props.blogData.body}</p>
           <div className='blog-like-container'>
-            {true ? (
+            {!userExists() ? (
               <img
                 className='like-clap'
                 src='http://localhost:3001/clap.png'

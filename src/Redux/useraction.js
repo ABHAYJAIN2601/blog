@@ -52,7 +52,6 @@ export const signupUser = (email, password, name) => {
 
     axios(OPTIONS)
       .then(res => {
-        console.log(res)
         // dispatch({
         //   // type: SIGNUP_USER,
         //   isLoggedIn: true
@@ -102,11 +101,9 @@ export const loginUser = (username, password) => {
 
     axios(OPTIONS)
       .then(res => {
-        console.log(res)
         const token = res.data.token
         localStorage.setItem('token', token)
         setAuthenticationToken(token)
-        console.log(jwt.decode(token, 'SECRET'))
 
         if (res.data.msg === 'Signed In Successfully') {
           dispatch(getUserById(jwt.decode(token, 'SECRET').id))
@@ -153,7 +150,6 @@ export const logoutUser = () => {
 }
 
 export const getBlogById = id => {
-  console.log(id)
   return function (dispatch) {
     var OPTIONS = {
       url: `http://localhost:3000/post/id/?id=${id}&viewing=true`,
@@ -165,7 +161,6 @@ export const getBlogById = id => {
 
     axios(OPTIONS)
       .then(res => {
-        console.log(res.data.post)
         // dispatch({
         //   type: GET_BLOG_BY_ID,
         //   payload: res.data.post
@@ -181,7 +176,6 @@ export const getBlogById = id => {
   }
 }
 export const addBlog = blog => {
-  console.log(blog)
   return function (dispatch) {
     var OPTIONS = {
       url: 'http://localhost:3000/post/create',
@@ -205,7 +199,6 @@ export const addBlog = blog => {
   }
 }
 export const addComment = (id, comment) => {
-  console.log(id, comment)
   return function (dispatch) {
     var OPTIONS = {
       url: 'http://localhost:3000/post/comment',
@@ -419,9 +412,7 @@ export const getUserLists = id => {
     console.log(id)
     dispatch({
       type: GET_USER_LISTS,
-      payload: [
-       
-      ]
+      payload: []
     })
   }
 }
@@ -449,7 +440,7 @@ export const deleteList = id => {
     })
   }
 }
-export const deleteRevision = (postId,id) => {
+export const deleteRevision = (postId, id) => {
   return function (dispatch) {
     // var OPTIONS = {
     //     url: "/blog",
@@ -466,16 +457,15 @@ export const deleteRevision = (postId,id) => {
     //     .catch((err) => {
     //         console.log(err);
     //     });
-    console.log(id)
+
     dispatch({
       type: DELETE_REVISION,
-      payload: {postId,revisionIndex:id}
+      payload: { postId, revisionIndex: id }
     })
   }
 }
 export const getList = id => {
   return function (dispatch) {
-    console.log(id)
     dispatch({
       type: GET_LIST,
       payload: id
@@ -490,7 +480,7 @@ export const editBlog = (id, blog) => {
       headers: {
         'content-type': 'application/json'
       },
-      data: {...blog,image:'sd'}
+      data: { ...blog, image: 'sd' }
     }
 
     axios(OPTIONS)
@@ -507,7 +497,6 @@ export const editBlog = (id, blog) => {
   }
 }
 export const getFilterBlogs = (searchText, filter) => {
-  console.log(searchText, filter)
   let url = ''
   let data = {}
 
@@ -534,7 +523,6 @@ export const getFilterBlogs = (searchText, filter) => {
 
     axios(OPTIONS)
       .then(res => {
-        console.log('like', res.data)
         dispatch({
           type: GET_FILTER_BLOGS,
           payload: res.data.posts
@@ -546,8 +534,6 @@ export const getFilterBlogs = (searchText, filter) => {
   }
 }
 export const sortBlogs = sort => {
-  console.log(sort)
-
   return function (dispatch) {
     dispatch({
       type: SORT_BLOGS,
@@ -580,7 +566,7 @@ export const getRevision = id => {
     //     .catch((err) => {
     //         console.log(err);
     //     });
-    console.log(id)
+
     dispatch({
       type: GET_REVISIONS,
       payload: id
@@ -588,7 +574,6 @@ export const getRevision = id => {
   }
 }
 export const getUserById = id => {
-  console.log(id)
   return function (dispatch) {
     var OPTIONS = {
       url: 'http://localhost:3000/profile?id=' + id,
@@ -600,7 +585,6 @@ export const getUserById = id => {
 
     axios(OPTIONS)
       .then(res => {
-        console.log('like', res.data)
         dispatch({
           type: GET_USER_BY_ID,
           payload: res.data
@@ -612,7 +596,6 @@ export const getUserById = id => {
   }
 }
 export const saveDraft = data => {
-  console.log(data)
   return function (dispatch) {
     // var OPTIONS = {
     //   url: 'http://localhost:3000/post/draft',
@@ -638,7 +621,6 @@ export const saveDraft = data => {
   }
 }
 export const deleteBlog = id => {
-  console.log(id)
   return function (dispatch) {
     var OPTIONS = {
       url: 'http://localhost:3000/post/delete',
@@ -651,7 +633,6 @@ export const deleteBlog = id => {
 
     axios(OPTIONS)
       .then(res => {
-        console.log(res.data)
         dispatch({
           type: DELETE_BLOG,
           payload: id
@@ -676,7 +657,6 @@ export const unFollowUser = id => {
 
     axios(OPTIONS)
       .then(res => {
-        console.log(res.data)
         dispatch({
           type: UNFOLLOW_USER,
           payload: res.data.id
@@ -689,14 +669,13 @@ export const unFollowUser = id => {
 }
 
 export const postType = type => {
-  console.log(type)
-  let url = '';
-  let method = 'GET';
+  let url = ''
+  let method = 'GET'
   if (type === 'top') {
     url = 'http://localhost:3000/posts/top'
   } else if (type === 'latest') {
     url = 'http://localhost:3000/post/latest'
-  } else if (type ==='recommend'){
+  } else if (type === 'recommend') {
     url = 'http://localhost:3000/post/recommended'
     method = 'POST'
   }
