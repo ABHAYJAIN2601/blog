@@ -17,10 +17,11 @@ const BlogList = (props) => {
 
   const[searchText,setSearchText]=useState('');
   const[filter,setFilter]=useState('Author');
-  const[sortBy ,setSortBy]=useState('Date');
+  const[sortBy ,setSortBy]=useState('Like');
   const handleSort=(e)=>{
     setSortBy(e.target.value);
-    props.sortBlogs(sortBy);
+    // if(sortBy!=='none')
+    // props.sortBlogs(sortBy);
   }
 
   return (
@@ -40,6 +41,7 @@ const BlogList = (props) => {
           <option value='Comment'>Comment</option>
           <option value='Views'>Views</option>
           </select>
+          <button className='sort-btn' onClick={()=>props.sortBlogs(sortBy)}>Sort</button>
           <button className='sort-btn' onClick={()=>{props.getBlogs();setSearchText('');}}>Reset</button>
           </div>
           <div className='blog-container'>

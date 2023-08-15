@@ -60,14 +60,14 @@ const UserProfile = props => {
             className={`tab-item ${4 === activeTab ? 'active' : ''}`}
             onClick={() => handleTabClick(4)}
           >
-            {'Followers'}
+            {'Following'}
           </div>
           <div
             key={5}
             className={`tab-item ${5 === activeTab ? 'active' : ''}`}
             onClick={() => handleTabClick(5)}
           >
-            {'Following'}
+            {'Followers'}
           </div>
           <div
             key={6}

@@ -33,11 +33,12 @@ function Blog (props) {
     if (usersData[userId].views === undefined) {
       usersData[userId].views = 0
     }
+    if(!props.blogLoading && props.blogData.user_id === undefined) return false;
     // console.log(props.blogData.user_id)
     // if(userId !== props.blogData.user_id) return true
-  
+   if(userId == props.blogData.user_id) return true
     if (usersData[userId].views < maxAllowedViews[userPlan]*2) {
-      
+     
       usersData[userId].views++
       localStorage.setItem('usersData', JSON.stringify(usersData))
       return true // User can view the blog

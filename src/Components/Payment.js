@@ -19,12 +19,12 @@ function Payment (props) {
       document.body.appendChild(script)
     })
   }
-  useEffect(() => {}, [planRate]);
+  // useEffect(() => {}, [planRate,getUserPlan(props.user.id)]);
   function getUserPlan(userId) {
     const usersData = JSON.parse(localStorage.getItem('usersData')) || {};
   
     if (usersData[userId] && usersData[userId].plan) {
-      console.log(usersData[userId].plan)
+      // console.log(usersData[userId].plan)
       return usersData[userId].plan;
     } else {
       return 'Free';
@@ -45,7 +45,10 @@ function Payment (props) {
   
     localStorage.setItem('usersData', JSON.stringify(usersData));
   }
-  async function displayRazorpay () {
+  
+  async function displayRazorpay (rate) {
+    setPlanRate(rate);
+    console.log(rate)
     const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js')
 
     if (!res) {
@@ -63,7 +66,7 @@ function Payment (props) {
     const { amount, id: order_id, currency } = result.data
 
     const options = {
-      key: 'rzp_test_UFJanyPy1zHSmZ', // Enter the Key ID generated from the Dashboard
+      key: 'rzp_test_UFJanyPy1zHSmZ', 
       amount: amount.toString(),
       currency: currency,
       name: 'Your Blog',
@@ -84,6 +87,7 @@ function Payment (props) {
         )
         if(result.data.status === 'success'){
           setUserPlan(props.user.id, planRate);
+          setPlanRate(planRate);
         }
          
      
@@ -125,7 +129,7 @@ function Payment (props) {
           <ul className='features'>
             <li>3 posts per day @50/month</li>
           </ul>
-          <button className='select-button' onClick={()=>{setPlanRate(50);displayRazorpay()}}>
+          <button className='select-button' onClick={()=>{displayRazorpay(50)}}>
             Select Plan
           </button>
         </div>
@@ -135,7 +139,7 @@ function Payment (props) {
           <ul className='features'>
             <li>5 posts per day @60/month</li>
           </ul>
-          <button className='select-button' onClick={()=>{setPlanRate(60);displayRazorpay()}}>
+          <button className='select-button' onClick={()=>{displayRazorpay(60)}}>
             Select Plan
           </button>
         </div>
@@ -145,7 +149,7 @@ function Payment (props) {
           <ul className='features'>
             <li>6 posts per day @70/month</li>
           </ul>
-          <button className='select-button' onClick={()=>{setPlanRate(70);displayRazorpay()}}>
+          <button className='select-button' onClick={()=>{displayRazorpay(70)}}>
             Select Plan
           </button>
         </div>
