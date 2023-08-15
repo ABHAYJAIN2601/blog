@@ -1,5 +1,5 @@
 import React, { useEffect , useState } from "react"
-import { createList, getUserLists } from "../../Redux/useraction"
+import { createList, deleteList, getUserLists } from "../../Redux/useraction"
 import { Link  } from "react-router-dom";
 import { connect } from "react-redux"
 
@@ -18,8 +18,12 @@ const UserList = (props)=>{
             </div>
             {!props.listLoding?props.userLists.map(list=>{
                 return(
+                    <div>
+                           <Link className='user-list' to={`/user-list/${list.id}`}>{list.list_name}</Link>
+                           <button className="blog-topic" onClick={()=>props.deleteList(list.id)}>Delete</button>
+                    </div>
                     
-                        <Link className='user-list' to={`/user-list/${list.id}`}>{list.list_name}</Link>
+                     
            
                 )
             }):<h1>Loading...</h1>}
@@ -37,7 +41,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
     return {
         getUserLists: data => dispatch(getUserLists(data)),
-        createList: data => dispatch(createList(data))
+        createList: data => dispatch(createList(data)),
+        deleteList: data => dispatch(deleteList(data))
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(UserList);

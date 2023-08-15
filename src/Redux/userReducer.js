@@ -24,7 +24,9 @@ import {
   SAVE_FOR_LATER,
   DELETE_DRAFT,
   EDIT_BLOG,
-  GET_REVISIONS
+  GET_REVISIONS,
+  DELETE_LIST,
+  DELETE_REVISION
 } from './types'
 const initialState = {
   isLoggedIn: false,
@@ -170,29 +172,63 @@ const userReducer = (state = initialState, action) => {
       const blogIndex = state.blogs.findIndex(
         blog => blog.id === action.payload.blogId
       )
-      console.log(userIndex, blogIndex)
-      if (userIndex !== -1 && blogIndex !== -1) {
-        const user = state.userLists[userIndex]
-        const blogToAdd = state.blogs[blogIndex]
+      // console.log(userIndex, blogIndex)
+      // if (userIndex !== -1 && blogIndex !== -1) {
+      //   const user = state.userLists[userIndex]
+      //   const blogToAdd = state.blogs[blogIndex]
 
-        if (!user.blogs.some(blog => blog.id === blogToAdd.id)) {
-          let updatedUser = {
-            ...user,
-            blogs: [...user.blogs, blogToAdd]
-          }
+      //   if (!user.blogs.some(blog => blog.id === blogToAdd.id)) {
+      //     let updatedUser = {
+      //       ...user,
+      //       blogs: [...user.blogs, blogToAdd]
+      //     }
 
-          let updatedUserLists = [...state.userLists]
-          updatedUserLists[userIndex] = updatedUser
-          console.log(updatedUserLists)
-          return {
-            ...state,
-            userLists: updatedUserLists
-          };
+      //     let updatedUserLists = [...state.userLists]
+      //     updatedUserLists[userIndex] = updatedUser
+      //     console.log(updatedUserLists)
+      //     return {
+      //       ...state,
+      //       userLists: updatedUserLists
+      //     };
          
-        }
-      }
-      console.log('User or blog not found')
-      return state; // Return the original state if user or blog not found
+      //   }
+      // }
+      return {
+        ...state,
+        userLists: state.userLists.map(list => {
+          if (list.id === action.payload.id) {
+            const existingBlogIndex = list.blogs.findIndex(blog => blog.id === action.payload.blogId);
+            
+            if (existingBlogIndex !== -1) {
+              // If the blog is found, update the specific blog
+              return {
+                ...list,
+                blogs: list.blogs.map(blog => {
+                  if (blog.id === action.payload.blogId) {
+                    
+                    return {
+                      ...blog,
+                      // Update properties of the blog if needed
+                    };
+                  }
+                  return blog; // Keep other blogs unchanged
+                }),
+              };
+            } else {
+              console.log('heyyy',list);
+              // If the blog is not found, push the new blog to the array
+              return {
+                ...list,
+
+                blogs: [...list.blogs, state.blogs.find(blog => blog.id === action.payload.blogId)],
+              };
+            }
+          }
+          return list; // Keep other lists unchanged
+        }),
+      };
+      
+      //  // Return the original state if user or blog not found
 
     case GET_BLOG_BY_ID:
       const blog = state.blogs.find(blog => blog.id == action.payload)
@@ -284,6 +320,22 @@ const userReducer = (state = initialState, action) => {
         blogRevisionData: state.revisionBlog.find(blog => blog.id === action.payload),
         revisionListLoading: false,
         }
+      case DELETE_REVISION:
+        console.log(action.payload)
+        return{
+          ...state,
+
+          revisionBlog: state.revisionBlog.map(blog => {
+            if (blog.id == action.payload.postId) {
+              console.log('heys',blog)
+              return {
+                ...blog,
+                revisions: blog.revisions.slice(0, action.payload.revisionIndex).concat(blog.revisions.slice(action.payload.revisionIndex + 1))
+              }
+            }
+            return blog
+          })
+        }
     case ADD_COMMENT:
       return {
         ...state,
@@ -308,15 +360,18 @@ const userReducer = (state = initialState, action) => {
         })
       }
     case GET_USER_LISTS:
+
       return {
         ...state,
-        userLists: action.payload,
+        userLists: [...state.userLists],
         listLoading: false
       }
     case GET_LIST:
       const listIndex = state.userLists.findIndex(
-        user => user.id === action.payload.id
+        user => user.id == action.payload
       )
+      console.log(state.userLists[listIndex], action.payload)
+      console.log(listIndex)
       if (listIndex !== -1) {
         return {
           ...state,
@@ -327,12 +382,20 @@ const userReducer = (state = initialState, action) => {
       return {
         ...state,
       }
+    case DELETE_LIST:
+      return{
+        ...state,
+        userLists: state.userLists.filter(list => {
+          return list.id !== action.payload
+        }
+        )
+      }
     case CREATE_LIST:
       return {
         ...state,
         userLists: [
           ...state.userLists,
-          { id: state.listData.length + 1, list_name: action.payload }
+          { id: state.listData.length + 1, list_name: action.payload ,blogs:[] }
         ]
       }
     case GET_FILTER_BLOGS:

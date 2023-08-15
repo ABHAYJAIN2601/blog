@@ -38,6 +38,7 @@ const BlogCard = props => {
         console.log(err)
       })
   }, [])
+  
   const followUser = () => {
     if (authorLoading === false) {
       return props.user.followed_user_ids.some(function (el) {

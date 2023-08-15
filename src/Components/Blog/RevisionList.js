@@ -2,21 +2,17 @@ import React, { useEffect } from 'react'
 import './ProfileModal.css' // Import your CSS file
 import {
   createList,
+  deleteRevision,
   getRevision,
   getUserLists,
   saveForLater
 } from '../../Redux/useraction'
 import { connect } from 'react-redux'
-import Blog from './Blog'
-import BlogCard from './BlogCard'
-import { Link } from 'react-router-dom'
 
 function RevisionList (props) {
   useEffect(() => {
-    console.log(props)
-    console.log('hey')
     props.getRevision(props.postId)
-  }, []);
+  }, [props.revisionBlog]);
   const handleVersion = (post) => {
     props.setState(post);
     props.onClose();
@@ -36,7 +32,7 @@ function RevisionList (props) {
         <div className='profile-details'>
           {!props.listLoding &&
             props.userLists &&
-            props.userLists.revisions.map(post => {
+            props.userLists.revisions.map((post,index) => {
               return (
                 <div>
                   <div className='blog-card' key={post.id}>
@@ -63,6 +59,7 @@ function RevisionList (props) {
                     </div>
                     <div className = 'card-footer'>
                     <button className='blog' onClick={()=>handleVersion(post)} >Shift This Version</button>
+                    <button className='blog' onClick={()=>props.deleteRevision(post.id,index)} >Delete Version</button>
                    </div>
                     
                   </div>
@@ -77,6 +74,7 @@ function RevisionList (props) {
 const mapStateToProps = state => {
   return {
     user: state.userDetails,
+    revisionBlog:state.revisionBlog,
     userLists: state.blogRevisionData,
     listLoding: state.revisionListLoading
   }
@@ -86,7 +84,8 @@ const mapDispatchToProps = dispatch => {
     getUserLists: data => dispatch(getUserLists(data)),
     createList: data => dispatch(createList(data)),
     saveForLater: (data, postId) => dispatch(saveForLater(data, postId)),
-    getRevision: data => dispatch(getRevision(data))
+    getRevision: data => dispatch(getRevision(data)),
+    deleteRevision: (postId,id) => dispatch(deleteRevision(postId,id))
   }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(RevisionList)

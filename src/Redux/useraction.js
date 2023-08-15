@@ -29,7 +29,9 @@ import {
   UNFOLLOW_USER,
   POST_TYPE,
   EDIT_BLOG,
-  GET_REVISIONS
+  GET_REVISIONS,
+  DELETE_LIST,
+  DELETE_REVISION
 } from './types'
 
 export const signupUser = (email, password, name) => {
@@ -418,13 +420,59 @@ export const getUserLists = id => {
     dispatch({
       type: GET_USER_LISTS,
       payload: [
-        { id: 1, list_name: 'Technology', blogs: [] },
-        { id: 2, list_name: 'React.js', blogs: [] }
+       
       ]
     })
   }
 }
+export const deleteList = id => {
+  return function (dispatch) {
+    // var OPTIONS = {
+    //     url: "/blog",
+    //     method: "GET",
+    //     headers: {
+    //         "content-type": "application/json",
+    //     },
+    // };
 
+    // axios(OPTIONS)
+    //     .then((res) => {
+
+    //     })
+    //     .catch((err) => {
+    //         console.log(err);
+    //     });
+    console.log(id)
+    dispatch({
+      type: DELETE_LIST,
+      payload: id
+    })
+  }
+}
+export const deleteRevision = (postId,id) => {
+  return function (dispatch) {
+    // var OPTIONS = {
+    //     url: "/blog",
+    //     method: "GET",
+    //     headers: {
+    //         "content-type": "application/json",
+    //     },
+    // };
+
+    // axios(OPTIONS)
+    //     .then((res) => {
+
+    //     })
+    //     .catch((err) => {
+    //         console.log(err);
+    //     });
+    console.log(id)
+    dispatch({
+      type: DELETE_REVISION,
+      payload: {postId,revisionIndex:id}
+    })
+  }
+}
 export const getList = id => {
   return function (dispatch) {
     console.log(id)

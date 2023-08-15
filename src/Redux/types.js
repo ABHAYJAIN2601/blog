@@ -1,4 +1,3 @@
-//Coaching actions
 export const SIGNUP_ADMIN = "SIGNUP_ADMIN";
 export const LOGIN_USER = "LOGIN_USER";
 export const SET_CURRENT_USER = "SET_CURRENT_USER";
@@ -28,3 +27,5 @@ export const SHOW_DRAFT = "SHOW_DRAFT";
 export const DELETE_DRAFT = "DELETE_DRAFT";
 export const POST_TYPE = "POST_TYPE";
 export const GET_REVISIONS = "GET_REVISIONS";
+export const DELETE_LIST = 'DELETE_LIST';
+export const DELETE_REVISION='DELETE_REVISION';

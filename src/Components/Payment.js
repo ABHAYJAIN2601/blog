@@ -1,4 +1,4 @@
-import React from 'react'
+import React ,{useEffect }from 'react'
 import logo from '../logo.svg'
 import './Payment.css'
 import axios from 'axios'
@@ -19,10 +19,12 @@ function Payment (props) {
       document.body.appendChild(script)
     })
   }
+  useEffect(() => {}, [planRate]);
   function getUserPlan(userId) {
     const usersData = JSON.parse(localStorage.getItem('usersData')) || {};
   
     if (usersData[userId] && usersData[userId].plan) {
+      console.log(usersData[userId].plan)
       return usersData[userId].plan;
     } else {
       return 'Free';
@@ -107,6 +109,16 @@ function Payment (props) {
   return (
     <div className='package-div'>
       <div className='payment-plan'>
+      <div className={getUserPlan(props.user.id)===1?'plan-user':'plan'}>
+          <h2>Free Plan</h2>
+          <p className='price'>Rs 0/month</p>
+          <ul className='features'>
+            <li>1 posts per day @0/month</li>
+          </ul>
+          <button className='select-button' onClick={()=>{setPlanRate(1);setUserPlan(props.user.id, planRate);}}>
+            Select Plan
+          </button>
+        </div>
         <div className={getUserPlan(props.user.id)===50?'plan-user':'plan'}>
           <h2>Basic Plan</h2>
           <p className='price'>Rs 50/month</p>

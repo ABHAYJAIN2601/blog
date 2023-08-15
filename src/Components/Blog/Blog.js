@@ -24,6 +24,7 @@ function Blog (props) {
 
     const userPlan = usersData[userId].plan
     const maxAllowedViews = {
+      1:100,
       50: 10000,
       60: 5,
       70: 6 // Premium users can view unlimited times
@@ -32,8 +33,11 @@ function Blog (props) {
     if (usersData[userId].views === undefined) {
       usersData[userId].views = 0
     }
-
-    if (usersData[userId].views < maxAllowedViews[userPlan]) {
+    // console.log(props.blogData.user_id)
+    // if(userId !== props.blogData.user_id) return true
+  
+    if (usersData[userId].views < maxAllowedViews[userPlan]*2) {
+      
       usersData[userId].views++
       localStorage.setItem('usersData', JSON.stringify(usersData))
       return true // User can view the blog
@@ -60,7 +64,7 @@ function Blog (props) {
   }
   useEffect(() => {
     props.getBlogById(params.id)
-  }, [])
+  }, [props.blogData])
   const [showDropdown, setShowDropdown] = useState(false)
 
   return (
@@ -159,7 +163,7 @@ function Blog (props) {
             </div>
           </div>
         </div>
-      )}</div> :<Payment />}
+     )}</div> :<Payment />}
     </div>
   )
 }
